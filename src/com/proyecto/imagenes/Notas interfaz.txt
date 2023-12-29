@@ -1,0 +1,30 @@
+En dado caso no funcione la manera reducida, puedo hacerlo asi:
+
+4 jpanel (tablero1, tablero2,....) que se muestren o no dependiendo del numero de jugadores
+en cada jpanel coloco los jpanel de la cuadricula (7x7, 8x8,...), es decir las casillas (49,64,...), proceso tedioso y largo pero es posible, y en cada casilla se tendria que agregar un jpanel porque al parecer no puedo poner imagenes en un panel asi nadamas
+
+
+Tengo que modificar el codigo, actualmente cada casilla es un jpanel pero necesito un jlabel por cada imagen que quiera poner en cada casilla, la forma de acceder a la casilla es la misma.
+lo que creo podriamos hacer es al principio hacer que muestre una imagen en blanco o de alguna textura cool para que se vea el tablero, y asi cuando hubiera algun sobreviviente, idealmente seria combinar las imagenes para que se siga viendo bien pero en este punto si muestra el sobreviviente entonces funciona, lo que se tendri que hacer seria que todas las casillas empiecen con una imagen de textura, y despues cuando accedamos a las casillas como explico abajo
+
+*buscar imagen de textura que se vea mas bonita
+
+si continuamos con la forma actualizada:
+
+para cambiar algo en una casilla especifica podemos acceder directamente a su instancia de 'Jpanel' correspondiente en la matriz 'tablero' y ahi podemos hacer lo que sea.
+
+Esto se hace especificando a que casilla queremos acceder proporcionando la 'fila' y 'columna'
+
+Por ejemplo si quiero cambiar el color de fondo de la casilla (2,3) hago esto:
+
+int fila = 2;
+int columna = 3;
+tablero[fila][columna].setBackground(Color.GREEN);
+
+lo que se me ocurre para poder ir mostrando donde estan los sobrevivientes es hacer un metodo que obtenga la coordenada del sobreviviente y con esa informacion actualizar la casilla (pensar mas a fondo esto, ya que esto es la base de poder mostrar las cosas en el tablero)
+
+
+(pensar en como se actualizara el tablero, con cada accion realizada, al final del turno)
+
+Se me acaba de ocurrir que la parte de auxiliar que tenemos debajo del mapa muestre los movimientos realizados, es decir, si el sobreviviente se mueve a la izquierda podria mostrar "Sobreviviente 1 se ha movido a la izquierda, o a la casilla 'x,y' "
+de esta forma, si algun sobreviviente se mueve a una casilla donde hay algun otro sobreviviente o zombie podriamos especificar que estan en la misma casilla si no logramos resolver que se vean las dos imagenes en un espacio tan chico.
