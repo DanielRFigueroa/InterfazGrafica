@@ -54,7 +54,7 @@ public class InterfazGrafica extends javax.swing.JFrame {
                 ImageIcon originalIcon = new ImageIcon(getClass().getResource("/com/proyecto/imagenes/texturacuadrada.jpg"));
                 Image originalImage = originalIcon.getImage();
 
-                // Escalamos la imagen al tamaño de la casilla
+                // Escalamos la imagen al tamaño de la casilla, para que sin importar el numero de  jugadores siempre se modifique
                 Image scaledImage = originalImage.getScaledInstance(casillaSize, casillaSize, Image.SCALE_SMOOTH);
                 ImageIcon scaledIcon = new ImageIcon(scaledImage);
                 JLabel label1 = new JLabel(scaledIcon);
@@ -119,12 +119,13 @@ public class InterfazGrafica extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 0));
-        // Intento de poner una imagen de fondo en el panel controles
+
+        // Intento de poner una imagen de fondo en el panel controles en vez de color de fondo
         Controles = new ImagePanel("/com/proyecto/imagenes/fondo1.png");
         //Controles.setBackground(new java.awt.Color(102, 102, 102));
 
         Up.setBackground(new java.awt.Color(0, 0, 0));
-        Up.setIcon(scaleImageIcon("/com/proyecto/imagenes/flechaup.png", 60, 60)); // Ajusta el tamaño según tus necesidades
+        Up.setIcon(scaleImageIcon("/com/proyecto/imagenes/flechaup.png", 60, 60));
         Up.setBorder(null);
         Up.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -372,6 +373,7 @@ public class InterfazGrafica extends javax.swing.JFrame {
         // BOTON NADA
     }//GEN-LAST:event_NothingActionPerformed
 
+    // Clase para poder usar imagenes de fondo en los jpanel, por el momento solo la he usado en Controles
     public class ImagePanel extends JPanel {
         private Image backgroundImage;
 
@@ -390,11 +392,7 @@ public class InterfazGrafica extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
+        // Set the Nimbus look and feel, esto lo tengo que instalar, pero lo dejo asi por si se utiliza este codigo en otra compu
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -411,9 +409,6 @@ public class InterfazGrafica extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(InterfazGrafica.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new InterfazGrafica().setVisible(true);
