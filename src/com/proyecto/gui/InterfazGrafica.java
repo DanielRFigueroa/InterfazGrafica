@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 public class InterfazGrafica extends javax.swing.JFrame {
 
     private int numeroDeJugadores;
-    private JPanel[][] tablero;
+    private static JLabel[][] tablero;
 
     public InterfazGrafica() {
 
@@ -22,53 +22,8 @@ public class InterfazGrafica extends javax.swing.JFrame {
         askNumberOfPlayers();  // Preguntar al usuario por el número de jugadores
         initComponents(); // Inicializar la interfaz gráfica después de obtener el número de jugadores
         createTablero(); // Crea el tablero dependiendo del numero de jugadores
-    }
-
-    private void createTablero() {
-        int gridSize = 7 + numeroDeJugadores - 1; // Calcula el tamaño del tablero según el número de jugadores
-        tablero = new JPanel[gridSize][gridSize];
-
-        // Configura el tamaño general del tablero y su diseño
-        Mapa.setLayout(new GridLayout(gridSize, gridSize));
-
-        // Tamaño de cada casilla
-        int casillaSize = 0;
-        if (numeroDeJugadores == 1) {
-            casillaSize = 80;
-        } else if (numeroDeJugadores == 2) {
-            casillaSize = 70;
-        } else if (numeroDeJugadores == 3) {
-            casillaSize = 62;
-        } else if (numeroDeJugadores == 4) {
-            casillaSize = 56;
-        }
-
-        // Crea las casillas y las agrega al tablero
-        for (int row = 0; row < gridSize; row++) {
-            for (int col = 0; col < gridSize; col++) {
-                JPanel casilla = new JPanel();
-                casilla.setLayout(null);
-                casilla.setPreferredSize(new Dimension(casillaSize, casillaSize)); // Establece el tamaño de cada casilla
-
-                // Añadimos imagen de textura
-                ImageIcon originalIcon = new ImageIcon(getClass().getResource("/com/proyecto/imagenes/texturacuadrada.jpg"));
-                Image originalImage = originalIcon.getImage();
-
-                // Escalamos la imagen al tamaño de la casilla, para que sin importar el numero de  jugadores siempre se modifique
-                Image scaledImage = originalImage.getScaledInstance(casillaSize, casillaSize, Image.SCALE_SMOOTH);
-                ImageIcon scaledIcon = new ImageIcon(scaledImage);
-                JLabel label1 = new JLabel(scaledIcon);
-                label1.setBounds(0, 5, casillaSize-1, casillaSize-1); // Posición y tamaño de la primera imagen
-
-                casilla.add(label1);
-                casilla.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                tablero[row][col] = casilla;
-                Mapa.add(casilla);
-            }
-        }
-        // Centra el tablero en el panel Mapa
-        Mapa.revalidate();
-        Mapa.repaint();
+        inicioSupervivientes(numeroDeJugadores);
+        generarZombies(numeroDeJugadores);
     }
     private void askNumberOfPlayers() {
         boolean numeroValido = false;
@@ -89,12 +44,173 @@ public class InterfazGrafica extends javax.swing.JFrame {
             }
         }
     }
+    private void createTablero() {
+        int gridSize = 7 + numeroDeJugadores - 1;
+        tablero = new JLabel[gridSize][gridSize];
+
+        Mapa.setLayout(new GridLayout(gridSize, gridSize));
+
+        int casillaSize = 0;
+        if (numeroDeJugadores == 1) {
+            casillaSize = 80;
+        } else if (numeroDeJugadores == 2) {
+            casillaSize = 70;
+        } else if (numeroDeJugadores == 3) {
+            casillaSize = 62;
+        } else if (numeroDeJugadores == 4) {
+            casillaSize = 56;
+        }
+
+        for (int row = 0; row < gridSize; row++) {
+            for (int col = 0; col < gridSize; col++) {
+                JLabel casilla = new JLabel();
+                casilla.setLayout(null);
+                casilla.setPreferredSize(new Dimension(casillaSize, casillaSize)); // Establece el tamaño de cada casilla
+
+                // Añadimos imagen de fondo
+                ImageIcon originalIcon = new ImageIcon(getClass().getResource("/com/proyecto/imagenes/texturacuadrada.jpg"));
+                Image originalImage = originalIcon.getImage();
+                Image scaledImage = originalImage.getScaledInstance(casillaSize, casillaSize, Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(scaledImage);
+                casilla.setIcon(scaledIcon);
+
+                casilla.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                tablero[row][col] = casilla;
+                Mapa.add(casilla);
+            }
+        }
+        Mapa.revalidate();
+        Mapa.repaint();
+    }
 
     private ImageIcon scaleImageIcon(String imagePath, int width, int height) {
         ImageIcon originalIcon = new ImageIcon(getClass().getResource(imagePath));
         Image originalImage = originalIcon.getImage();
         Image scaledImage = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledImage);
+    }
+
+    public void cambiarImagenCasilla(int coordX, int coordY, String imagePath) {
+        // Verifica que las coordenadas estén dentro de los límites del tablero
+        if (coordX >= 0 && coordX < tablero.length && coordY >= 0 && coordY < tablero[0].length) {
+            // Añade la nueva imagen a la casilla sin afectar la imagen de fondo
+            ImageIcon newIcon = new ImageIcon(getClass().getResource("/com/proyecto/imagenes/Atacarx.png"));
+            Image newImage = newIcon.getImage();
+            Image scaledImage = newImage.getScaledInstance(tablero[coordX][coordY].getWidth(), tablero[coordX][coordY].getHeight(), Image.SCALE_SMOOTH);
+            ImageIcon scaledIcon = new ImageIcon(scaledImage);
+            tablero[coordX][coordY].setIcon(scaledIcon);
+        }
+    }
+
+    private void inicioSupervivientes(int numeroDeJugadores) {
+        JLabel casilla = tablero[0][0];
+
+        // Tamaño de la casilla
+        int casillaSize = casilla.getPreferredSize().width;
+
+        int maxImagenesPorFila = 2;
+
+        // Número máximo de imágenes a mostrar
+        int maxImagenes = 4;
+
+        // Calcula el número real de imágenes a mostrar basado en el número de jugadores
+        int numImagenes = Math.min(numeroDeJugadores, maxImagenes);
+
+        // Espaciado entre las imágenes
+        int spacing = 5;
+
+        // Calcula el tamaño de cada imagen
+        int imageHeight = 0;
+        int imageWidth = 0;
+        if (numeroDeJugadores == 1) {
+            imageHeight = 40;
+            imageWidth = 40;
+        } else if (numeroDeJugadores == 2) {
+            imageHeight = 30;
+            imageWidth = 30;
+        } else if (numeroDeJugadores == 3) {
+            imageHeight = 28;
+            imageWidth = 28;
+        } else if (numeroDeJugadores == 4) {
+            imageHeight = 25;
+            imageWidth = 25;
+        }
+
+        // Coordenadas iniciales para la primera imagen
+        int x = 0;
+        int y = 0;
+
+        // Crea las imágenes y las agrega a la casilla
+        for (int i = 0; i < numImagenes; i++) {
+            JLabel label = new JLabel(new ImageIcon(getClass().getResource("/com/proyecto/imagenes/monito2.jpg")));
+            label.setBounds(x, y, imageWidth, imageHeight);
+            casilla.add(label);
+
+            // Actualiza las coordenadas para la próxima imagen
+            x += imageWidth + spacing;
+            if ((i + 1) % maxImagenesPorFila == 0) {
+                x = 0;
+                y += imageHeight + spacing;
+            }
+        }
+
+        // Repinta la casilla para que se reflejen los cambios
+        casilla.revalidate();
+        casilla.repaint();
+    }
+
+    private void generarZombies(int numeroDeJugadores) {
+        int maxImagenesPorFila = 2;
+        int maxImagenes = numeroDeJugadores * 3;
+
+        // Espaciado entre las imágenes
+        int spacing = 5;
+
+        for (int i = 0; i < maxImagenes; i++) {
+            // Obtenemos una casilla aleatoria diferente de (0, 0)
+            int randomRow, randomCol;
+            do {
+                randomRow = (int) (Math.random() * tablero.length);
+                randomCol = (int) (Math.random() * tablero[0].length);
+            } while (randomRow == 0 && randomCol == 0);
+
+            JLabel casilla = tablero[randomRow][randomCol];
+
+            // Tamaño de la casilla
+            int casillaSize = casilla.getPreferredSize().width;
+
+            // Calcula el tamaño de cada imagen
+            int imageHeight = 0;
+            int imageWidth = 0;
+            if (numeroDeJugadores == 1) {
+                imageHeight = 40;
+                imageWidth = 40;
+            } else if (numeroDeJugadores == 2) {
+                imageHeight = 30;
+                imageWidth = 30;
+            } else if (numeroDeJugadores == 3) {
+                imageHeight = 28;
+                imageWidth = 28;
+            } else if (numeroDeJugadores == 4) {
+                imageHeight = 25;
+                imageWidth = 25;
+            }
+
+            // Crea la imagen y la agrega a la casilla
+            JLabel label = new JLabel(new ImageIcon(getClass().getResource("/com/proyecto/imagenes/zombie.png")));
+            label.setBounds(randomRow, randomCol, imageWidth, imageHeight);
+            casilla.add(label);
+
+            /*randomRow += imageWidth + spacing;
+            if ((i + 1) % maxImagenesPorFila == 0) {
+                randomRow = 0;
+                randomCol += imageHeight + spacing;
+            }*/
+
+            // Repinta la casilla para que se reflejen los cambios
+            casilla.revalidate();
+            casilla.repaint();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -342,12 +458,9 @@ public class InterfazGrafica extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void UpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpActionPerformed
-        // FLECHA ARRIBA
+        // numerox = 2;
+        // cambiarImagenCasilla(coordsuperviviente, coordsuperviviente, "/com/proyecto/imagenes/Superviviente.png");
     }//GEN-LAST:event_UpActionPerformed
-
-    private void ChangeWeaponActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChangeWeaponActionPerformed
-        // CAMBIAR ARMA
-    }//GEN-LAST:event_ChangeWeaponActionPerformed
 
     private void DownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DownActionPerformed
         // FLECHA ABAJO
@@ -361,6 +474,10 @@ public class InterfazGrafica extends javax.swing.JFrame {
         // FLECHA DERECHA
     }//GEN-LAST:event_RightActionPerformed
 
+    private void ChangeWeaponActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChangeWeaponActionPerformed
+        // CAMBIAR ARMA
+    }//GEN-LAST:event_ChangeWeaponActionPerformed
+
     private void SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchActionPerformed
         // BUSCAR
     }//GEN-LAST:event_SearchActionPerformed
@@ -371,6 +488,8 @@ public class InterfazGrafica extends javax.swing.JFrame {
 
     private void NothingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NothingActionPerformed
         // BOTON NADA
+        cambiarImagenCasilla(0, 3, "/com/proyecto/imagenes/Atacarx.png");
+
     }//GEN-LAST:event_NothingActionPerformed
 
     // Clase para poder usar imagenes de fondo en los jpanel, por el momento solo la he usado en Controles
